@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Vinted Photo Bot</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:#080b10;
+color:#f5f7fa;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif
+}
+
+.container{
+max-width:1200px;
+margin:auto;
+padding:18px
+}
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:18px
+}
+
+.logo{
+font-size:23px;
+font-weight:800
+}
+
+.subtitle{
+font-size:13px;
+color:#8d96a3;
+margin-top:3px
+}
+
+.help{
+background:#171c25;
+border:1px solid #303846;
+color:white;
+border-radius:10px;
+padding:9px 13px
+}
+
+.layout{
+display:grid;
+grid-template-columns:390px 1fr;
+gap:15px
+}
+
+.card{
+background:#11161e;
+border:1px solid #252d39;
+border-radius:14px;
+padding:16px;
+margin-bottom:15px
+}
+
+h2{
+font-size:17px;
+margin:0 0 8px
+}
+
+.small{
+font-size:13px;
+color:#8e98a6
+}
+
+.upload{
+display:block;
+border:1px dashed #485466;
+border-radius:12px;
+padding:30px 15px;
+text-align:center;
+margin-top:15px;
+cursor:pointer;
+background:#0c1118
+}
+
+.upload-icon{
+font-size:30px;
+margin-bottom:8px
+}
+
+.upload strong{
+display:block;
+font-size:16px
+}
+
+.upload span{
+font-size:12px;
+color:#8d96a3
+}
+
+#photos{
+display:none
+}
+
+.thumb-grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:7px;
+margin-top:12px
+}
+
+.thumb{
+position:relative
+}
+
+.thumb img{
+width:100%;
+aspect-ratio:1;
+object-fit:cover;
+border-radius:8px
+}
+
+.remove{
+position:absolute;
+right:3px;
+top:3px;
+width:22px;
+height:22px;
+padding:0;
+margin:0;
+border-radius:50%;
+background:#151a22;
+color:white;
+border:1px solid #444;
+font-size:14px
+}
+
+.green{
+color:#4ade80;
+font-size:13px;
+margin-top:10px
+}
+
+.option{
+display:flex;
+align-items:center;
+gap:10px;
+padding:10px 0;
+font-size:14px
+}
+
+.option input{
+width:20px;
+height:20px;
+accent-color:#4f7cff
+}
+
+button{
+width:100%;
+border:0;
+border-radius:10px;
+padding:13px;
+font-size:15px;
+font-weight:700;
+cursor:pointer;
+margin-top:10px;
+background:#5267ff;
+color:white
+}
+
+button:disabled{
+opacity:.4
+}
+
+.secondary{
+background:#202733
+}
+
+.results{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:12px
+}
+
+.result{
+background:#0b1016;
+border:1px solid #29313d;
+border-radius:12px;
+padding:8px;
+position:relative
+}
+
+.result img{
+width:100%;
+display:block;
+border-radius:8px
+}
+
+.badge{
+position:absolute;
+left:14px;
+top:14px;
+background:#16794a;
+padding:4px 7px;
+border-radius:6px;
+font-size:11px;
+font-weight:700
+}
+
+.download{
+position:absolute;
+right:14px;
+top:14px;
+width:32px;
+height:32px;
+padding:0;
+margin:0;
+background:#242c38;
+border-radius:7px
+}
+
+input[type=text],
+textarea{
+width:100%;
+background:#0b1016;
+border:1px solid #303846;
+border-radius:9px;
+padding:11px;
+color:white;
+font-size:14px;
+margin-top:7px
+}
+
+textarea{
+resize:vertical
+}
+
+.field{
+margin-top:10px
+}
+
+.field label{
+font-size:12px;
+color:#9aa4b1
+}
+
+.grid2{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px
+}
+
+.status{
+color:#9ca6b4;
+font-size:13px;
+line-height:1.5;
+margin-top:10px
+}
+
+.info{
+background:#101a31;
+border:1px solid #4058a8;
+border-radius:10px;
+padding:12px;
+font-size:12px;
+line-height:1.5;
+margin-top:10px
+}
+
+@media(max-width:800px){
+.layout{
+grid-template-columns:1fr
+}
+
+.results{
+grid-template-columns:1fr 1fr
+}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+<div>
+<div class="logo">📷 Vinted Photo Bot</div>
+<div class="subtitle">Professionelle Produktbilder für Vinted</div>
+</div>
+
+<button class="help" onclick="showHelp()">ⓘ Hilfe</button>
+</header>
+
+
+<div class="layout">
+
+<!-- LINKE SEITE -->
+
+<div>
+
+<div class="card">
+
+<h2>1. Bilder auswählen</h2>
+
+<div class="small">
+Mehrere Bilder aus deiner Galerie auswählen
+</div>
+
+<label class="upload" for="photos">
+
+<div class="upload-icon">🖼️</div>
+
+<strong>Fotos & Galerie öffnen</strong>
+
+<span>Mehrere Bilder auf einmal auswählen</span>
+
+</label>
+
+<input
+id="photos"
+type="file"
+accept="image/*"
+multiple
+>
+
+<div
+id="selectedText"
+class="green"
+style="display:none">
+</div>
+
+<div
+id="thumbGrid"
+class="thumb-grid">
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>2. Bearbeitungsoptionen</h2>
+
+<div class="small">
+Wähle aus, wie deine Bilder bearbeitet werden sollen
+</div>
+
+
+<div class="option">
+
+<input
+type="checkbox"
+id="removeBg"
+checked>
+
+<label for="removeBg">
+Hintergrund entfernen (sauber ausschneiden)
+</label>
+
+</div>
+
+
+<div class="option">
+
+<input
+type="checkbox"
+id="concrete"
+checked>
+
+<label for="concrete">
+Auf Vinted-Betonhintergrund platzieren
+</label>
+
+</div>
+
+
+<div class="option">
+
+<input
+type="checkbox"
+id="shadow"
+checked>
+
+<label for="shadow">
+Natürlichen Schatten hinzufügen
+</label>
+
+</div>
+
+
+<div class="option">
+
+<input
+type="checkbox"
+id="center"
+checked>
+
+<label for="center">
+Größe anpassen & zentrieren
+</label>
+
+</div>
+
+
+<div class="info">
+
+<b>✨ Was macht der Bot?</b><br><br>
+
+Das Produkt wird möglichst sauber vom ursprünglichen Hintergrund getrennt,
+auf einem Beton-Hintergrund platziert, passend skaliert und mit einem
+weichen Kontaktschatten versehen.
+
+</div>
+
+
+<button
+id="processBtn"
+disabled
+onclick="processImages()">
+
+✨ Bilder bearbeiten
+
+</button>
+
+<div
+id="status"
+class="status">
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>3. Ergebnis herunterladen</h2>
+
+<div class="small">
+Lade einzelne Bilder oder alle Bilder herunter
+</div>
+
+<button
+class="secondary"
+onclick="downloadAll()">
+
+⬇️ Alle Bilder speichern
+
+</button>
+
+</div>
+
+</div>
+
+
+<!-- RECHTE SEITE -->
+
+<div>
+
+<div class="card">
+
+<h2>
+Ergebnisse
+<span id="resultCount"></span>
+</h2>
+
+<div class="small">
+Deine bearbeiteten Produktbilder
+</div>
+
+<div
+id="results"
+class="results"
+style="margin-top:14px">
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>4. Vinted Beschreibung erstellen</h2>
+
+<div class="small">
+Fülle die Felder aus und erhalte eine fertige Beschreibung
+</div>
+
+
+<div class="grid2">
+
+<div class="field">
+
+<label>Marke</label>
+
+<input
+id="brand"
+type="text"
+placeholder="z.B. adidas">
+
+</div>
+
+
+<div class="field">
+
+<label>Zustand</label>
+
+<input
+id="condition"
+type="text"
+placeholder="z.B. Sehr gut">
+
+</div>
+
+
+<div class="field">
+
+<label>Artikel</label>
+
+<input
+id="item"
+type="text"
+placeholder="z.B. Trainingsjacke">
+
+</div>
+
+
+<div class="field">
+
+<label>Farbe</label>
+
+<input
+id="color"
+type="text"
+placeholder="z.B. Dunkelblau / Weiß">
+
+</div>
+
+
+<div class="field">
+
+<label>Größe</label>
+
+<input
+id="size"
+type="text"
+placeholder="z.B. M">
+
+</div>
+
+
+<div class="field">
+
+<label>Besonderheiten</label>
+
+<input
+id="details"
+type="text"
+placeholder="z.B. 3-Streifen">
+
+</div>
+
+</div>
+
+
+<button onclick="createDescription()">
+
+✨ Beschreibung generieren
+
+</button>
+
+
+<textarea
+id="description"
+rows="9"
+placeholder="Deine Vinted-Beschreibung erscheint hier...">
+</textarea>
+
+
+<button
+class="secondary"
+onclick="copyDescription()">
+
+📋 Beschreibung kopieren
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- BACKGROUND REMOVAL LIBRARY -->
+
+<script type="module">
+
+import {
+removeBackground
+} from
+"https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm";
+
+
+window.removeProductBackground =
+removeBackground;
+
+</script>
+
+
+<script>
+
+/* ==========================
+   VARIABLEN
+========================== */
+
+let selectedFiles = [];
+
+let processedImages = [];
+
+
+/* ==========================
+   FOTOS AUS GALERIE
+========================== */
+
+const input =
+document.getElementById("photos");
+
+
+input.addEventListener(
+"change",
+function(){
+
+selectedFiles =
+Array.from(input.files);
+
+renderThumbnails();
+
+}
+);
+
+
+/* ==========================
+   THUMBNAILS
+========================== */
+
+function renderThumbnails(){
+
+const grid =
+document.getElementById("thumbGrid");
+
+const text =
+document.getElementById("selectedText");
+
+grid.innerHTML = "";
+
+
+if(
+selectedFiles.length === 0
+){
+
+text.style.display =
+"none";
+
+document.getElementById(
+"processBtn"
+).disabled = true;
+
+return;
+
+}
+
+
+text.style.display =
+"block";
+
+text.innerText =
+"✓ " +
+selectedFiles.length +
+" Bilder ausgewählt";
+
+
+selectedFiles.forEach(
+(file,index)=>{
+
+const div =
+document.createElement("div");
+
+div.className =
+"thumb";
+
+
+const img =
+document.createElement("img");
+
+img.src =
+URL.createObjectURL(file);
+
+
+const remove =
+document.createElement("button");
+
+remove.className =
+"remove";
+
+remove.innerText =
+"×";
+
+
+remove.onclick =
+()=>{
+
+selectedFiles.splice(
+index,
+1
+);
+
+renderThumbnails();
+
+};
+
+
+div.appendChild(img);
+
+div.appendChild(remove);
+
+grid.appendChild(div);
+
+}
+);
+
+
+document.getElementById(
+"processBtn"
+).disabled = false;
+
+}
+
+
+/* ==========================
+   BETONBODEN
+========================== */
+
+function createConcreteCanvas(){
+
+const canvas =
+document.createElement("canvas");
+
+canvas.width = 1200;
+canvas.height = 1200;
+
+const ctx =
+canvas.getContext("2d");
+
+
+const gradient =
+ctx.createLinearGradient(
+0,
+0,
+1200,
+1200
+);
+
+gradient.addColorStop(
+0,
+"#a3a09a"
+);
+
+gradient.addColorStop(
+.45,
+"#85827c"
+);
+
+gradient.addColorStop(
+1,
+"#6d6a65"
+);
+
+
+ctx.fillStyle =
+gradient;
+
+ctx.fillRect(
+0,
+0,
+1200,
+1200
+);
+
+
+/* Betonstruktur */
+
+for(
+let i=0;
+i<7000;
+i++
+){
+
+const brightness =
+Math.random() >
+.5
+?
+255
+:
+0;
+
+
+ctx.fillStyle =
+"rgba("+
+brightness+
+","+
+brightness+
+","+
+brightness+
+","+
+(
+Math.random()*
+.035
+)+
+")";
+
+
+ctx.beginPath();
+
+ctx.arc(
+Math.random()*1200,
+Math.random()*1200,
+Math.random()*2.5,
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
+}
+
+
+/* leichte Bodenflecken */
+
+for(
+let i=0;
+i<80;
+i++
+){
+
+ctx.fillStyle =
+"rgba(50,50,50,.025)";
+
+ctx.beginPath();
+
+ctx.ellipse(
+Math.random()*1200,
+Math.random()*1200,
+Math.random()*80+20,
+Math.random()*30+10,
+Math.random()*Math.PI,
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
+}
+
+
+return canvas;
+
+}
+
+
+/* ==========================
+   PNG → IMAGE
+========================== */
+
+function loadImage(src){
+
+return new Promise(
+(resolve,reject)=>{
+
+const img =
+new Image();
+
+img.onload =
+()=>resolve(img);
+
+img.onerror =
+reject;
+
+img.src =
+src;
+
+}
+);
+
+}
+
+
+/* ==========================
+   EIN BILD BEARBEITEN
+========================== */
+
+async function processOne(
+file,
+number,
+total
+){
+
+const status =
+document.getElementById(
+"status"
+);
+
+
+status.innerText =
+"KI schneidet Bild "+
+number+
+" von "+
+total+
+" aus...";
+
+
+let productURL;
+
+
+if(
+document.getElementById(
+"removeBg"
+).checked
+){
+
+if(
+!window.removeProductBackground
+){
+
+throw new Error(
+"Die Freistellungs-KI konnte nicht geladen werden."
+);
+
+}
+
+
+const blob =
+await window.removeProductBackground(
+file
+);
+
+
+productURL =
+URL.createObjectURL(
+blob
+);
+
+}else{
+
+productURL =
+URL.createObjectURL(
+file
+);
+
+}
+
+
+status.innerText =
+"Produkt wird auf Beton platziert...";
+
+
+const product =
+await loadImage(
+productURL
+);
+
+
+const canvas =
+createConcreteCanvas();
+
+const ctx =
+canvas.getContext("2d");
+
+
+/* maximale Produktgröße */
+
+let maxWidth =
+900;
+
+let maxHeight =
+900;
+
+
+const scale =
+Math.min(
+maxWidth/product.width,
+maxHeight/product.height,
+1
+);
+
+
+const width =
+product.width*scale;
+
+const height =
+product.height*scale;
+
+
+const x =
+(1200-width)/2;
+
+const y =
+(1200-height)/2;
+
+
+/* Schatten */
+
+if(
+document.getElementById(
+"shadow"
+).checked
+){
+
+ctx.save();
+
+ctx.shadowColor =
+"rgba(0,0,0,.42)";
+
+ctx.shadowBlur =
+30;
+
+ctx.shadowOffsetX =
+0;
+
+ctx.shadowOffsetY =
+18;
+
+
+ctx.drawImage(
+product,
+x,
+y,
+width,
+height
+);
+
+ctx.restore();
+
+}else{
+
+ctx.drawImage(
+product,
+x,
+y,
+width,
+height
+);
+
+}
+
+
+return canvas.toDataURL(
+"image/jpeg",
+.95
+);
+
+}
+
+
+/* ==========================
+   ALLE BILDER
+========================== */
+
+async function processImages(){
+
+if(
+selectedFiles.length === 0
+){
+
+alert(
+"Bitte zuerst Bilder auswählen."
+);
+
+return;
+
+}
+
+
+const button =
+document.getElementById(
+"processBtn"
+);
+
+button.disabled =
+true;
+
+
+const status =
+document.getElementById(
+"status"
+);
+
+const results =
+document.getElementById(
+"results"
+);
+
+
+results.innerHTML =
+"";
+
+processedImages =
+[];
+
+
+for(
+let i=0;
+i<selectedFiles.length;
+i++
+){
+
+try{
+
+const result =
+await processOne(
+selectedFiles[i],
+i+1,
+selectedFiles.length
+);
+
+
+processedImages.push(
+result
+);
+
+
+addResult(
+result,
+i
+);
+
+
+}catch(error){
+
+console.error(error);
+
+const errorBox =
+document.createElement(
+"div"
+);
+
+errorBox.className =
+"status";
+
+errorBox.innerText =
+"❌ Fehler bei Bild "+
+(i+1)+
+": "+
+error.message;
+
+results.appendChild(
+errorBox
+);
+
+}
+
+}
+
+
+status.innerText =
+"✅ Alle Bilder wurden bearbeitet.";
+
+document.getElementById(
+"resultCount"
+).innerText =
+" ("+
+processedImages.length+
+")";
+
+
+button.disabled =
+false;
+
+}
+
+
+/* ==========================
+   ERGEBNIS
+========================== */
+
+function addResult(
+src,
+index
+){
+
+const box =
+document.getElementById(
+"results"
+);
+
+
+const item =
+document.createElement(
+"div"
+);
+
+item.className =
+"result";
+
+
+const img =
+document.createElement(
+"img"
+);
+
+img.src =
+src;
+
+
+const badge =
+document.createElement(
+"div"
+);
+
+badge.className =
+"badge";
+
+badge.innerText =
+"Fertig";
+
+
+const button =
+document.createElement(
+"button"
+);
+
+button.className =
+"download";
+
+button.innerText =
+"⬇";
+
+
+button.onclick =
+()=>{
+
+download(
+src,
+"vinted-produktbild-"+
+(index+1)+
+".jpg"
+);
+
+};
+
+
+item.appendChild(img);
+
+item.appendChild(badge);
+
+item.appendChild(button);
+
+box.appendChild(item);
+
+}
+
+
+/* ==========================
+   DOWNLOAD
+========================== */
+
+function download(
+src,
+filename
+){
+
+const a =
+document.createElement(
+"a"
+);
+
+a.href =
+src;
+
+a.download =
+filename;
+
+document.body.appendChild(a);
+
+a.click();
+
+a.remove();
+
+}
+
+
+/* ==========================
+   ALLE SPEICHERN
+========================== */
+
+function downloadAll(){
+
+if(
+processedImages.length === 0
+){
+
+alert(
+"Bitte zuerst Bilder bearbeiten."
+);
+
+return;
+
+}
+
+
+processedImages.forEach(
+(src,index)=>{
+
+setTimeout(
+()=>{
+
+download(
+src,
+"vinted-produktbild-"+
+(index+1)+
+".jpg"
+);
+
+},
+index*300
+);
+
+}
+
+}
+
+
+/* ==========================
+   VINTED BESCHREIBUNG
+========================== */
+
+function createDescription(){
+
+const brand =
+document.getElementById(
+"brand"
+).value.trim();
+
+
+const item =
+document.getElementById(
+"item"
+).value.trim();
+
+
+const size =
+document.getElementById(
+"size"
+).value.trim();
+
+
+const condition =
+document.getElementById(
+"condition"
+).value.trim();
+
+
+const color =
+document.getElementById(
+"color"
+).value.trim();
+
+
+const details =
+document.getElementById(
+"details"
+).value.trim();
+
+
+const description =
+
+`Verkaufe hier ${
+brand || "einen"
+} ${
+item || "Artikel"
+} ${
+size ? "in Größe "+size : ""
+}.
+
+Der Artikel befindet sich in ${
+condition || "sehr gutem Zustand"
+}.
+
+${
+color
+? "Farbe: "+color+"."
+: ""
+}
+
+${
+details
+? "Besonderheiten: "+details+"."
+: ""
+}
+
+📦 Schneller Versand
+
+💬 Bei Fragen gerne melden!
+
+📸 Die Bilder zeigen den tatsächlichen Artikel.
+
+#vinted #fashion #streetwear #clothing ${
+brand
+? "#"+brand.replace(/\s+/g,"")
+: ""
+}`;
+
+
+document.getElementById(
+"description"
+).value =
+description;
+
+}
+
+
+/* ==========================
+   KOPIEREN
+========================== */
+
+function copyDescription(){
+
+const text =
+document.getElementById(
+"description"
+).value;
+
+
+if(!text){
+
+alert(
+"Erstelle zuerst eine Beschreibung."
+);
+
+return;
+
+}
+
+
+navigator.clipboard.writeText(
+text
+);
+
+alert(
+"Beschreibung kopiert!"
+);
+
+}
+
+
+/* ==========================
+   HILFE
+========================== */
+
+function showHelp(){
+
+alert(
+"1. Mehrere Fotos aus deiner Galerie auswählen.\n\n"+
+"2. Bilder bearbeiten drücken.\n\n"+
+"3. Die KI entfernt den ursprünglichen Hintergrund.\n\n"+
+"4. Das Produkt wird auf einen Betonboden gesetzt.\n\n"+
+"5. Fertige Bilder einzeln speichern."
+);
+
+}
+
+</script>
+
+</body>
+</html>
