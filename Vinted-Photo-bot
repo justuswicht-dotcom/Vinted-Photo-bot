@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vinted Photo Bot</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #111;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.container {
+  max-width: 650px;
+  margin: auto;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 5px;
+}
+
+p {
+  color: #aaa;
+}
+
+.card {
+  background: #1d1d1d;
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 13px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px solid #444;
+  background: #111;
+  color: white;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 14px;
+  border: none;
+  border-radius: 13px;
+  background: white;
+  color: black;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.preview {
+  width: 100%;
+  margin-top: 15px;
+  border-radius: 14px;
+}
+
+#preview,
+#result {
+  display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📸 Vinted Photo Bot</h1>
+
+<p>
+Rohes Kleidungsfoto → sauberes Produktbild
+mit Beton-Hintergrund
+</p>
+
+<div class="card">
+
+<h2>1. Foto auswählen</h2>
+
+<input
+  type="file"
+  id="image"
+  accept="image/*"
+  capture="environment"
+>
+
+<img id="preview" class="preview">
+
+<button onclick="createProductImage()">
+🧱 Beton-Produktbild erstellen
+</button>
+
+<p id="status"></p>
+
+</div>
+
+
+<div class="card">
+
+<h2>2. Vinted Beschreibung</h2>
+
+<input
+  id="brand"
+  placeholder="Marke, z.B. Nike"
+>
+
+<input
+  id="item"
+  placeholder="Artikel, z.B. Tech Fleece Hoodie"
+>
+
+<input
+  id="size"
+  placeholder="Größe, z.B. M"
+>
+
+<input
+  id="condition"
+  placeholder="Zustand, z.B. sehr gut"
+>
+
+<textarea
+  id="details"
+  rows="4"
+  placeholder="Farbe, Besonderheiten, Modell..."
+></textarea>
+
+<button onclick="createDescription()">
+📝 Beschreibung erstellen
+</button>
+
+<textarea
+  id="description"
+  rows="9"
+  placeholder="Hier erscheint deine Vinted-Beschreibung..."
+></textarea>
+
+</div>
+
+
+<div class="card">
+
+<h2>3. Ergebnis</h2>
+
+<img id="result" class="preview">
+
+<button onclick="downloadImage()">
+💾 Bild speichern
+</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+let originalImage = null;
+let finalImage = null;
+
+
+/* FOTO LADEN */
+
+document
+.getElementById("image")
+.addEventListener("change", function(event) {
+
+  const file = event.target.files[0];
+
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+
+    originalImage = e.target.result;
+
+    const preview =
+      document.getElementById("preview");
+
+    preview.src = originalImage;
+
+    preview.style.display = "block";
+
+  };
+
+  reader.readAsDataURL(file);
+
+});
+
+
+/* PRODUKTBILD */
+
+function createProductImage() {
+
+  if (!originalImage) {
+
+    alert("Bitte zuerst ein Foto auswählen.");
+
+    return;
+
+  }
+
+  document.getElementById("status").innerText =
+    "Produktbild wird erstellt...";
+
+
+  const img = new Image();
+
+  img.onload = function() {
+
+    const canvas =
+      document.createElement("canvas");
+
+    canvas.width = 1200;
+    canvas.height = 1200;
+
+    const ctx = canvas.getContext("2d");
+
+
+    /* BETON HINTERGRUND */
+
+    const gradient =
+      ctx.createLinearGradient(
+        0,
+        0,
+        1200,
+        1200
+      );
+
+    gradient.addColorStop(
+      0,
+      "#8a8a8a"
+    );
+
+    gradient.addColorStop(
+      0.5,
+      "#696969"
+    );
+
+    gradient.addColorStop(
+      1,
+      "#4f4f4f"
+    );
+
+    ctx.fillStyle = gradient;
+
+    ctx.fillRect(
+      0,
+      0,
+      1200,
+      1200
+    );
+
+
+    /* BETON TEXTUR */
+
+    for (
+      let i = 0;
+      i < 3500;
+      i++
+    ) {
+
+      ctx.fillStyle =
+        "rgba(255,255,255," +
+        Math.random() * 0.025 +
+        ")";
+
+      ctx.beginPath();
+
+      ctx.arc(
+        Math.random() * 1200,
+        Math.random() * 1200,
+        Math.random() * 2,
+        0,
+        Math.PI * 2
+      );
+
+      ctx.fill();
+
+    }
+
+
+    /* PRODUKT SKALIEREN */
+
+    const maxSize = 900;
+
+    const scale =
+      Math.min(
+        maxSize / img.width,
+        maxSize / img.height
+      );
+
+    const width =
+      img.width * scale;
+
+    const height =
+      img.height * scale;
+
+    const x =
+      (1200 - width) / 2;
+
+    const y =
+      (1200 - height) / 2;
+
+
+    /* SCHATTEN */
+
+    ctx.save();
+
+    ctx.shadowColor =
+      "rgba(0,0,0,0.45)";
+
+    ctx.shadowBlur = 35;
+
+    ctx.shadowOffsetY = 20;
+
+    ctx.drawImage(
+      img,
+      x,
+      y,
+      width,
+      height
+    );
+
+    ctx.restore();
+
+
+    /* BILD SPEICHERN */
+
+    finalImage =
+      canvas.toDataURL(
+        "image/jpeg",
+        0.95
+      );
+
+
+    const result =
+      document.getElementById("result");
+
+    result.src = finalImage;
+
+    result.style.display = "block";
+
+
+    document.getElementById("status").innerText =
+      "✅ Fertig!";
+
+
+    result.scrollIntoView({
+      behavior: "smooth"
+    });
+
+  };
+
+
+  img.src = originalImage;
+
+}
+
+
+/* VINTED BESCHREIBUNG */
+
+function createDescription() {
+
+  const brand =
+    document.getElementById("brand")
+    .value || "Marke";
+
+  const item =
+    document.getElementById("item")
+    .value || "Artikel";
+
+  const size =
+    document.getElementById("size")
+    .value || "nicht angegeben";
+
+  const condition =
+    document.getElementById("condition")
+    .value || "sehr guter Zustand";
+
+  const details =
+    document.getElementById("details")
+    .value;
+
+
+  const hashtags =
+    "#" +
+    brand.replace(/\s+/g, "") +
+    " #vinted #fashion #streetwear #clothing";
+
+
+  const text =
+
+`${brand} ${item}
+
+📏 Größe: ${size}
+
+✨ Zustand: ${condition}
+
+${details}
+
+📦 Schneller Versand
+
+💬 Bei Fragen gerne schreiben
+
+📸 Alle Fotos zeigen den aktuellen Zustand.
+
+${hashtags}`;
+
+
+  document.getElementById("description")
+    .value = text;
+
+}
+
+
+/* BILD HERUNTERLADEN */
+
+function downloadImage() {
+
+  if (!finalImage) {
+
+    alert(
+      "Bitte zuerst ein Produktbild erstellen."
+    );
+
+    return;
+
+  }
+
+
+  const link =
+    document.createElement("a");
+
+  link.href = finalImage;
+
+  link.download =
+    "vinted-produktbild.jpg";
+
+  link.click();
+
+}
+
+</script>
+
+</body>
+</html>
