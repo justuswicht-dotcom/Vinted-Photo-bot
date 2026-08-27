@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<title>Vinted Photo Bot</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+html{
+    background:#080b10;
+}
+
+body{
+    margin:0;
+    background:#080b10;
+    color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+}
+
+.container{
+    width:100%;
+    max-width:950px;
+    margin:auto;
+    padding:20px;
+}
+
+header{
+    padding:10px 0 25px;
+}
+
+.logo{
+    font-size:30px;
+    font-weight:800;
+    line-height:1.1;
+}
+
+.subtitle{
+    color:#929baa;
+    font-size:15px;
+    margin-top:7px;
+}
+
+.card{
+    background:#11161e;
+    border:1px solid #29313d;
+    border-radius:18px;
+    padding:18px;
+    margin-bottom:16px;
+}
+
+h2{
+    margin:0 0 7px;
+    font-size:21px;
+}
+
+.small{
+    color:#929baa;
+    font-size:14px;
+    line-height:1.5;
+}
+
+.upload{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    min-height:170px;
+    margin-top:16px;
+    border:2px dashed #465267;
+    border-radius:16px;
+    background:#0b1017;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+}
+
+.upload:active{
+    transform:scale(.99);
+}
+
+.upload-icon{
+    font-size:45px;
+}
+
+.upload-title{
+    font-size:19px;
+    font-weight:700;
+    margin-top:8px;
+}
+
+.upload-sub{
+    color:#929baa;
+    font-size:14px;
+    margin-top:5px;
+}
+
+#photoInput{
+    display:none;
+}
+
+.status{
+    margin-top:13px;
+    padding:12px;
+    background:#0b1119;
+    border-radius:10px;
+    color:#9da7b5;
+    font-size:14px;
+}
+
+.preview-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-top:14px;
+}
+
+.preview{
+    position:relative;
+}
+
+.preview img{
+    width:100%;
+    aspect-ratio:1/1;
+    object-fit:cover;
+    display:block;
+    border-radius:10px;
+    background:#222;
+}
+
+.delete{
+    position:absolute;
+    right:4px;
+    top:4px;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    border:0;
+    background:rgba(0,0,0,.8);
+    color:#fff;
+    font-size:18px;
+    padding:0;
+}
+
+.add-more{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:1px solid #3a4555;
+    background:#1a212c;
+    color:#fff;
+    border-radius:10px;
+    font-weight:700;
+}
+
+.option{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:11px 0;
+    font-size:15px;
+}
+
+.option input{
+    width:22px;
+    height:22px;
+    accent-color:#557cff;
+    flex-shrink:0;
+}
+
+.info{
+    margin-top:14px;
+    padding:14px;
+    border-radius:12px;
+    background:#101a31;
+    border:1px solid #3857a5;
+    color:#cdd6e8;
+    font-size:13px;
+    line-height:1.55;
+}
+
+.main-button{
+    width:100%;
+    padding:15px;
+    margin-top:15px;
+    border:0;
+    border-radius:12px;
+    background:#526cff;
+    color:#fff;
+    font-size:16px;
+    font-weight:800;
+}
+
+.main-button:disabled{
+    opacity:.4;
+}
+
+.secondary-button{
+    width:100%;
+    padding:13px;
+    margin-top:10px;
+    border:0;
+    border-radius:12px;
+    background:#222a35;
+    color:#fff;
+    font-size:15px;
+    font-weight:700;
+}
+
+.results{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-top:15px;
+}
+
+.result{
+    position:relative;
+    padding:7px;
+    border-radius:13px;
+    background:#090d13;
+    border:1px solid #29313d;
+}
+
+.result img{
+    width:100%;
+    display:block;
+    border-radius:9px;
+}
+
+.download{
+    position:absolute;
+    right:13px;
+    top:13px;
+    width:40px;
+    height:40px;
+    border:0;
+    border-radius:9px;
+    background:rgba(0,0,0,.75);
+    color:white;
+    font-size:18px;
+}
+
+.grid2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.field{
+    margin-top:12px;
+}
+
+.field label{
+    color:#aeb6c2;
+    font-size:13px;
+}
+
+input[type=text],
+textarea{
+    width:100%;
+    margin-top:7px;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #303846;
+    background:#0a0f16;
+    color:#fff;
+    font-size:15px;
+    outline:none;
+}
+
+textarea{
+    min-height:180px;
+    resize:vertical;
+}
+
+.ready{
+    color:#4ade80;
+}
+
+.warning{
+    color:#fbbf24;
+}
+
+@media(max-width:600px){
+
+    .container{
+        padding:14px;
+    }
+
+    .logo{
+        font-size:28px;
+    }
+
+    .preview-grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .results{
+        grid-template-columns:1fr;
+    }
+
+    .grid2{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+<header>
+    <div class="logo">📸 Vinted Photo Bot</div>
+    <div class="subtitle">
+        Professionelle Produktbilder für Vinted
+    </div>
+</header>
+
+
+<!-- =====================================================
+     1. FOTOS
+===================================================== -->
+
+<div class="card">
+
+<h2>1. Bilder auswählen</h2>
+
+<div class="small">
+Wähle mehrere Produktfotos direkt aus deiner iPhone-Fotos-App.
+</div>
+
+
+<label
+    class="upload"
+    for="photoInput"
+>
+
+<div>
+
+<div class="upload-icon">
+🖼️
+</div>
+
+<div class="upload-title">
+Fotos & Galerie öffnen
+</div>
+
+<div class="upload-sub">
+Mehrere Bilder gleichzeitig auswählen
+</div>
+
+</div>
+
+</label>
+
+
+<input
+    id="photoInput"
+    type="file"
+    accept="image/*"
+    multiple
+>
+
+
+<div
+    id="photoStatus"
+    class="status"
+>
+Noch keine Bilder ausgewählt
+</div>
+
+
+<div
+    id="previewGrid"
+    class="preview-grid"
+></div>
+
+
+<button
+    id="addMoreButton"
+    class="add-more"
+    type="button"
+    style="display:none"
+>
+＋ Weitere Bilder hinzufügen
+</button>
+
+</div>
+
+
+<!-- =====================================================
+     2. BEARBEITUNG
+===================================================== -->
+
+<div class="card">
+
+<h2>2. Bildbearbeitung</h2>
+
+<div class="small">
+Das Produkt wird automatisch vom ursprünglichen Hintergrund getrennt
+und auf einen Betonboden gesetzt.
+</div>
+
+
+<div class="option">
+
+<input
+    id="removeBackground"
+    type="checkbox"
+    checked
+>
+
+<label for="removeBackground">
+✂️ Hintergrund entfernen
+</label>
+
+</div>
+
+
+<div class="option">
+
+<input
+    id="concrete"
+    type="checkbox"
+    checked
+>
+
+<label for="concrete">
+🪨 Betonboden verwenden
+</label>
+
+</div>
+
+
+<div class="option">
+
+<input
+    id="shadow"
+    type="checkbox"
+    checked
+>
+
+<label for="shadow">
+🌑 Realistischen Schatten hinzufügen
+</label>
+
+</div>
+
+
+<div class="option">
+
+<input
+    id="center"
+    type="checkbox"
+    checked
+>
+
+<label for="center">
+📐 Produkt sauber zentrieren
+</label>
+
+</div>
+
+
+<div class="info">
+
+<b>✨ Ziel des Bots</b><br><br>
+
+Das Kleidungsstück soll möglichst sauber ausgeschnitten werden.
+Der alte Hintergrund wird entfernt. Anschließend liegt das Produkt
+ordentlich auf einem neutralen Betonboden – ähnlich wie bei deinem
+Beispielbild.
+
+</div>
+
+
+<button
+    id="processButton"
+    class="main-button"
+    type="button"
+    disabled
+>
+✨ Bilder bearbeiten
+</button>
+
+
+<div
+    id="processStatus"
+    class="status"
+>
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     3. ERGEBNISSE
+===================================================== -->
+
+<div class="card">
+
+<h2>3. Fertige Produktbilder</h2>
+
+<div class="small">
+Hier erscheinen deine fertigen Bilder.
+</div>
+
+
+<div
+    id="results"
+    class="results"
+></div>
+
+
+<button
+    id="downloadAllButton"
+    class="secondary-button"
+    type="button"
+    style="display:none"
+>
+⬇️ Alle Bilder speichern
+</button>
+
+</div>
+
+
+<!-- =====================================================
+     4. VINTED BESCHREIBUNG
+===================================================== -->
+
+<div class="card">
+
+<h2>4. Vinted Beschreibung</h2>
+
+<div class="small">
+Erstelle automatisch eine fertige Beschreibung.
+</div>
+
+
+<div class="grid2">
+
+
+<div class="field">
+
+<label>
+Marke
+</label>
+
+<input
+    id="brand"
+    type="text"
+    placeholder="z.B. Adidas"
+>
+
+</div>
+
+
+<div class="field">
+
+<label>
+Artikel
+</label>
+
+<input
+    id="item"
+    type="text"
+    placeholder="z.B. Trainingsjacke"
+>
+
+</div>
+
+
+<div class="field">
+
+<label>
+Größe
+</label>
+
+<input
+    id="size"
+    type="text"
+    placeholder="z.B. M"
+>
+
+</div>
+
+
+<div class="field">
+
+<label>
+Farbe
+</label>
+
+<input
+    id="color"
+    type="text"
+    placeholder="z.B. Schwarz / Weiß"
+>
+
+</div>
+
+
+<div class="field">
+
+<label>
+Zustand
+</label>
+
+<input
+    id="condition"
+    type="text"
+    placeholder="z.B. Sehr gut"
+>
+
+</div>
+
+
+<div class="field">
+
+<label>
+Besonderheiten
+</label>
+
+<input
+    id="details"
+    type="text"
+    placeholder="z.B. 3-Streifen"
+>
+
+</div>
+
+</div>
+
+
+<button
+    id="descriptionButton"
+    class="main-button"
+    type="button"
+>
+📝 Beschreibung erstellen
+</button>
+
+
+<textarea
+    id="descriptionText"
+    placeholder="Deine Vinted-Beschreibung erscheint hier..."
+></textarea>
+
+
+<button
+    id="copyButton"
+    class="secondary-button"
+    type="button"
+>
+📋 Beschreibung kopieren
+</button>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     BACKGROUND REMOVAL LIBRARY
+===================================================== -->
+
+<script type="module">
+
+import {
+    removeBackground
+} from
+"https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm";
+
+
+window.removeProductBackground =
+    removeBackground;
+
+
+window.dispatchEvent(
+    new Event("backgroundRemovalReady")
+);
+
+</script>
+
+
+<script>
+
+/* =====================================================
+   VARIABLEN
+===================================================== */
+
+let selectedFiles = [];
+
+let processedImages = [];
+
+let backgroundReady = false;
+
+
+const photoInput =
+document.getElementById(
+    "photoInput"
+);
+
+
+const photoStatus =
+document.getElementById(
+    "photoStatus"
+);
+
+
+const previewGrid =
+document.getElementById(
+    "previewGrid"
+);
+
+
+const addMoreButton =
+document.getElementById(
+    "addMoreButton"
+);
+
+
+const processButton =
+document.getElementById(
+    "processButton"
+);
+
+
+const processStatus =
+document.getElementById(
+    "processStatus"
+);
+
+
+const results =
+document.getElementById(
+    "results"
+);
+
+
+const downloadAllButton =
+document.getElementById(
+    "downloadAllButton"
+);
+
+
+/* =====================================================
+   KI BEREIT
+===================================================== */
+
+window.addEventListener(
+    "backgroundRemovalReady",
+    function(){
+
+        backgroundReady = true;
+
+        processStatus.innerText =
+            "✅ Bildbearbeitung bereit.";
+
+    }
+);
+
+
+/* =====================================================
+   FOTOS AUSWÄHLEN
+===================================================== */
+
+photoInput.addEventListener(
+    "change",
+    function(event){
+
+        const files =
+            Array.from(
+                event.target.files || []
+            );
+
+
+        if(!files.length){
+            return;
+        }
+
+
+        files.forEach(
+            function(file){
+
+                if(
+                    !file.type.startsWith(
+                        "image/"
+                    )
+                ){
+                    return;
+                }
+
+
+                const duplicate =
+                    selectedFiles.some(
+                        function(oldFile){
+
+                            return (
+                                oldFile.name === file.name &&
+                                oldFile.size === file.size &&
+                                oldFile.lastModified ===
+                                file.lastModified
+                            );
+
+                        }
+                    );
+
+
+                if(!duplicate){
+
+                    selectedFiles.push(
+                        file
+                    );
+
+                }
+
+            }
+        );
+
+
+        /*
+        WICHTIG FÜR IPHONE:
+
+        Das Input wird zurückgesetzt,
+        damit man später erneut Fotos
+        auswählen kann.
+        */
+
+        photoInput.value = "";
+
+
+        renderPreviews();
+
+    }
+);
+
+
+/* =====================================================
+   WEITERE BILDER
+===================================================== */
+
+addMoreButton.addEventListener(
+    "click",
+    function(){
+
+        photoInput.click();
+
+    }
+);
+
+
+/* =====================================================
+   VORSCHAUBILDER
+===================================================== */
+
+function renderPreviews(){
+
+    previewGrid.innerHTML = "";
+
+
+    if(
+        selectedFiles.length === 0
+    ){
+
+        photoStatus.innerText =
+            "Noch keine Bilder ausgewählt";
+
+        addMoreButton.style.display =
+            "none";
+
+        processButton.disabled =
+            true;
+
+        return;
+
+    }
+
+
+    photoStatus.innerHTML =
+        "✅ <b>" +
+        selectedFiles.length +
+        "</b> Bild" +
+        (
+            selectedFiles.length === 1
+            ? ""
+            : "er"
+        ) +
+        " ausgewählt";
+
+
+    addMoreButton.style.display =
+        "block";
+
+
+    processButton.disabled =
+        false;
+
+
+    selectedFiles.forEach(
+        function(file,index){
+
+            const wrapper =
+                document.createElement(
+                    "div"
+                );
+
+            wrapper.className =
+                "preview";
+
+
+            const img =
+                document.createElement(
+                    "img"
+                );
+
+
+            const url =
+                URL.createObjectURL(
+                    file
+                );
+
+
+            img.src = url;
+
+
+            img.onload =
+                function(){
+
+                    URL.revokeObjectURL(
+                        url
+                    );
+
+                };
+
+
+            const removeButton =
+                document.createElement(
+                    "button"
+                );
+
+
+            removeButton.className =
+                "delete";
+
+
+            removeButton.type =
+                "button";
+
+
+            removeButton.innerText =
+                "×";
+
+
+            removeButton.onclick =
+                function(event){
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    selectedFiles.splice(
+                        index,
+                        1
+                    );
+
+
+                    renderPreviews();
+
+                };
+
+
+            wrapper.appendChild(
+                img
+            );
+
+
+            wrapper.appendChild(
+                removeButton
+            );
+
+
+            previewGrid.appendChild(
+                wrapper
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   BILD LADEN
+===================================================== */
+
+function loadImage(src){
+
+    return new Promise(
+        function(resolve,reject){
+
+            const img =
+                new Image();
+
+
+            img.onload =
+                function(){
+
+                    resolve(img);
+
+                };
+
+
+            img.onerror =
+                function(){
+
+                    reject(
+                        new Error(
+                            "Bild konnte nicht geladen werden."
+                        )
+                    );
+
+                };
+
+
+            img.src = src;
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   BETONBODEN
+===================================================== */
+
+function createConcrete(){
+
+    const canvas =
+        document.createElement(
+            "canvas"
+        );
+
+
+    canvas.width = 1200;
+
+    canvas.height = 1200;
+
+
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
+
+
+    /*
+    Grundfarbe
+    */
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            1200,
+            1200
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "#b5b3ae"
+    );
+
+
+    gradient.addColorStop(
+        .45,
+        "#999792"
+    );
+
+
+    gradient.addColorStop(
+        1,
+        "#777570"
+    );
+
+
+    ctx.fillStyle =
+        gradient;
+
+
+    ctx.fillRect(
+        0,
+        0,
+        1200,
+        1200
+    );
+
+
+    /*
+    Feine Betonstruktur
+    */
+
+    for(
+        let i = 0;
+        i < 12000;
+        i++
+    ){
+
+        const gray =
+            80 +
+            Math.random()*130;
+
+
+        const alpha =
+            Math.random()*.035;
+
+
+        ctx.fillStyle =
+            "rgba("+
+            gray+
+            ","+
+            gray+
+            ","+
+            gray+
+            ","+
+            alpha+
+            ")";
+
+
+        ctx.beginPath();
+
+
+        ctx.arc(
+            Math.random()*1200,
+            Math.random()*1200,
+            Math.random()*2.5,
+            0,
+            Math.PI*2
+        );
+
+
+        ctx.fill();
+
+    }
+
+
+    /*
+    Größere Betonflecken
+    */
+
+    for(
+        let i = 0;
+        i < 100;
+        i++
+    ){
+
+        ctx.fillStyle =
+            "rgba(40,40,40,.025)";
+
+
+        ctx.beginPath();
+
+
+        ctx.ellipse(
+            Math.random()*1200,
+            Math.random()*1200,
+            20 + Math.random()*100,
+            10 + Math.random()*50,
+            Math.random()*Math.PI,
+            0,
+            Math.PI*2
+        );
+
+
+        ctx.fill();
+
+    }
+
+
+    return canvas;
+
+}
+
+
+/* =====================================================
+   EIN BILD BEARBEITEN
+===================================================== */
+
+async function processOne(
+    file,
+    number,
+    total
+){
+
+    processStatus.innerText =
+        "⏳ Bild " +
+        number +
+        " von " +
+        total +
+        " wird freigestellt...";
+
+
+    let productBlob;
+
+
+    /*
+    HINTERGRUND ENTFERNEN
+    */
+
+    if(
+        document.getElementById(
+            "removeBackground"
+        ).checked
+    ){
+
+        if(
+            !window.removeProductBackground
+        ){
+
+            throw new Error(
+                "Die Freistellungs-KI ist noch nicht geladen. Bitte kurz warten und erneut versuchen."
+            );
+
+        }
+
+
+        productBlob =
+            await window.removeProductBackground(
+                file
+            );
+
+    }
+    else{
+
+        productBlob =
+            file;
+
+    }
+
+
+    processStatus.innerText =
+        "🪨 Betonboden wird erstellt...";
+
+
+    const productURL =
+        URL.createObjectURL(
+            productBlob
+        );
+
+
+    const product =
+        await loadImage(
+            productURL
+        );
+
+
+    const canvas =
+        document.getElementById(
+            "concrete"
+        ).checked
+        ? createConcrete()
+        : document.createElement(
+            "canvas"
+        );
+
+
+    if(
+        !document.getElementById(
+            "concrete"
+        ).checked
+    ){
+
+        canvas.width = 1200;
+
+        canvas.height = 1200;
+
+    }
+
+
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
+
+
+    /*
+    Wenn Beton ausgeschaltet ist:
+    weißer Hintergrund
+    */
+
+    if(
+        !document.getElementById(
+            "concrete"
+        ).checked
+    ){
+
+        ctx.fillStyle =
+            "#ffffff";
+
+
+        ctx.fillRect(
+            0,
+            0,
+            1200,
+            1200
+        );
+
+    }
+
+
+    /*
+    PRODUKTGRÖSSE
+
+    Das Kleidungsstück wird groß,
+    aber nicht abgeschnitten.
+    */
+
+    const maxWidth = 940;
+
+    const maxHeight = 900;
+
+
+    const scale =
+        Math.min(
+            maxWidth / product.width,
+            maxHeight / product.height,
+            1
+        );
+
+
+    const width =
+        product.width * scale;
+
+
+    const height =
+        product.height * scale;
+
+
+    /*
+    PRODUKT ZENTRIEREN
+    */
+
+    let x =
+        (1200 - width) / 2;
+
+
+    let y =
+        (1200 - height) / 2;
+
+
+    /*
+    Etwas nach unten,
+    damit es wie auf einem Boden liegt.
+    */
+
+    y += 45;
+
+
+    /*
+    SCHATTEN
+    */
+
+    if(
+        document.getElementById(
+            "shadow"
+        ).checked
+    ){
+
+        ctx.save();
+
+
+        ctx.shadowColor =
+            "rgba(0,0,0,.43)";
+
+
+        ctx.shadowBlur =
+            32;
+
+
+        ctx.shadowOffsetX =
+            0;
+
+
+        ctx.shadowOffsetY =
+            20;
+
+
+        ctx.drawImage(
+            product,
+            x,
+            y,
+            width,
+            height
+        );
+
+
+        ctx.restore();
+
+    }
+    else{
+
+        ctx.drawImage(
+            product,
+            x,
+            y,
+            width,
+            height
+        );
+
+    }
+
+
+    URL.revokeObjectURL(
+        productURL
+    );
+
+
+    return canvas.toDataURL(
+        "image/jpeg",
+        .95
+    );
+
+}
+
+
+/* =====================================================
+   ALLE BILDER BEARBEITEN
+===================================================== */
+
+processButton.addEventListener(
+    "click",
+    processAll
+);
+
+
+async function processAll(){
+
+    if(
+        selectedFiles.length === 0
+    ){
+
+        alert(
+            "Bitte zuerst Bilder auswählen."
+        );
+
+        return;
+
+    }
+
+
+    processButton.disabled =
+        true;
+
+
+    results.innerHTML =
+        "";
+
+
+    processedImages =
+        [];
+
+
+    for(
+        let i = 0;
+        i < selectedFiles.length;
+        i++
+    ){
+
+        try{
+
+            const result =
+                await processOne(
+                    selectedFiles[i],
+                    i + 1,
+                    selectedFiles.length
+                );
+
+
+            processedImages.push(
+                result
+            );
+
+
+            showResult(
+                result,
+                i
+            );
+
+        }
+        catch(error){
+
+            console.error(
+                error
+            );
+
+
+            const errorBox =
+                document.createElement(
+                    "div"
+                );
+
+
+            errorBox.className =
+                "status";
+
+
+            errorBox.innerHTML =
+                "❌ <b>Fehler bei Bild " +
+                (i + 1) +
+                "</b><br>" +
+                error.message;
+
+
+            results.appendChild(
+                errorBox
+            );
+
+        }
+
+    }
+
+
+    processStatus.innerHTML =
+        '<span class="ready">✅ KI-Bearbeitung abgeschlossen.</span>';
+
+
+    processButton.disabled =
+        false;
+
+
+    if(
+        processedImages.length > 0
+    ){
+
+        downloadAllButton.style.display =
+            "block";
+
+    }
+
+}
+
+
+/* =====================================================
+   ERGEBNIS
+===================================================== */
+
+function showResult(
+    src,
+    index
+){
+
+    const box =
+        document.createElement(
+            "div"
+        );
+
+
+    box.className =
+        "result";
+
+
+    const img =
+        document.createElement(
+            "img"
+        );
+
+
+    img.src =
+        src;
+
+
+    const button =
+        document.createElement(
+            "button"
+        );
+
+
+    button.className =
+        "download";
+
+
+    button.type =
+        "button";
+
+
+    button.innerText =
+        "⬇️";
+
+
+    button.onclick =
+        function(){
+
+            downloadImage(
+                src,
+                "vinted-produktbild-" +
+                (index + 1) +
+                ".jpg"
+            );
+
+        };
+
+
+    box.appendChild(
+        img
+    );
+
+
+    box.appendChild(
+        button
+    );
+
+
+    results.appendChild(
+        box
+    );
+
+}
+
+
+/* =====================================================
+   EINZELNES BILD SPEICHERN
+===================================================== */
+
+function downloadImage(
+    src,
+    filename
+){
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        src;
+
+
+    link.download =
+        filename;
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    link.remove();
+
+}
+
+
+/* =====================================================
+   ALLE BILDER SPEICHERN
+===================================================== */
+
+downloadAllButton.addEventListener(
+    "click",
+    function(){
+
+        processedImages.forEach(
+            function(src,index){
+
+                setTimeout(
+                    function(){
+
+                        downloadImage(
+                            src,
+                            "vinted-produktbild-" +
+                            (index + 1) +
+                            ".jpg"
+                        );
+
+                    },
+                    index * 500
+                );
+
+            }
+        );
+
+    }
+);
+
+
+/* =====================================================
+   VINTED BESCHREIBUNG
+===================================================== */
+
+document.getElementById(
+    "descriptionButton"
+).addEventListener(
+    "click",
+    createDescription
+);
+
+
+function createDescription(){
+
+    const brand =
+        document.getElementById(
+            "brand"
+        ).value.trim();
+
+
+    const item =
+        document.getElementById(
+            "item"
+        ).value.trim();
+
+
+    const size =
+        document.getElementById(
+            "size"
+        ).value.trim();
+
+
+    const color =
+        document.getElementById(
+            "color"
+        ).value.trim();
+
+
+    const condition =
+        document.getElementById(
+            "condition"
+        ).value.trim();
+
+
+    const details =
+        document.getElementById(
+            "details"
+        ).value.trim();
+
+
+    const description =
+
+`${brand || "Artikel"} ${item || ""}
+
+📏 Größe: ${size || "siehe Bilder"}
+
+🎨 Farbe: ${color || "siehe Bilder"}
+
+✨ Zustand: ${condition || "sehr gut"}
+
+${details
+    ? "⭐ Besonderheiten: " + details
+    : ""
+}
+
+📸 Der Artikel auf den Bildern ist der tatsächlich angebotene Artikel.
+
+📦 Schneller und sicherer Versand.
+
+💬 Bei Fragen oder Interesse gerne schreiben!
+
+#vinted #fashion #streetwear #clothing #secondhand ${
+    brand
+        ? "#" + brand.replace(/\s+/g,"")
+        : ""
+}`;
+
+
+    document.getElementById(
+        "descriptionText"
+    ).value =
+        description;
+
+}
+
+
+/* =====================================================
+   BESCHREIBUNG KOPIEREN
+===================================================== */
+
+document.getElementById(
+    "copyButton"
+).addEventListener(
+    "click",
+    async function(){
+
+        const textarea =
+            document.getElementById(
+                "descriptionText"
+            );
+
+
+        if(
+            !textarea.value.trim()
+        ){
+
+            alert(
+                "Bitte zuerst eine Beschreibung erstellen."
+            );
+
+            return;
+
+        }
+
+
+        try{
+
+            await navigator.clipboard.writeText(
+                textarea.value
+            );
+
+
+            alert(
+                "✅ Beschreibung kopiert!"
+            );
+
+        }
+        catch(error){
+
+            textarea.select();
+
+            document.execCommand(
+                "copy"
+            );
+
+
+            alert(
+                "✅ Beschreibung kopiert!"
+            );
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   START
+===================================================== */
+
+renderPreviews();
+
+</script>
+
+</body>
+</html>
